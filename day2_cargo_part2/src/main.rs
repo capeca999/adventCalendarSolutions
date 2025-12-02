@@ -1,16 +1,20 @@
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Error};
+
 fn main() {
     let file_path = "src/puzzleInput.txt";
     let file = File::open(file_path);
     match file {
         Ok(f) => match resolve_puzzle(f) {
-            Ok(result) => println!("Puzzle solved: {}", result),
+            Ok(result) => println!("\x1b[1;93m✨ Puzzle solved: {} ✨\x1b[0m", result),
             Err(e) => eprintln!("Error solving puzzle: {}", e),
         },
         Err(e) => eprintln!("Error opening file {}: {}", file_path, e),
     }
+
+    println!("\x07");
+
 }
 
 fn resolve_puzzle(file: File) -> Result<i64, Error> {

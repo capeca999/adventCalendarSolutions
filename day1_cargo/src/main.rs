@@ -11,7 +11,7 @@ fn main() {
     let file = File::open(file_path);
     match file {
         Ok(f) => match resolve_puzzle(f) {
-            Ok(result) => println!("Puzzle solved: {}", result),
+            Ok(result) => println!("\x1b[1;93m✨ Puzzle solved: {} ✨\x1b[0m", result),
             Err(e) => eprintln!("Error solving puzzle: {}", e),
         },
         Err(e) => eprintln!("Error opening file {}: {}", file_path, e),
@@ -34,13 +34,13 @@ fn resolve_puzzle(file: File) -> Result<i32, Error> {
         if first_char == TURN_LEFT_KEY {
             // Turn left
             actual_position = turn_left(actual_position, line);
-            if(actual_position == BREAK_POINT_KEY) {
+            if actual_position == BREAK_POINT_KEY {
                 times_reached_break_point = times_reached_break_point + 1;
             }
         } else if first_char == TURN_RIGHT_KEY {
             // Turn right
             actual_position = turn_right(actual_position, line);
-            if(actual_position == BREAK_POINT_KEY) {
+            if actual_position == BREAK_POINT_KEY {
                 times_reached_break_point = times_reached_break_point + 1;
             }
         }
@@ -68,7 +68,7 @@ fn calculate_distance(pos : i32, mov : i32) -> i32 {
 
     let mut new_pos = (pos + mov) % 100;
 
-    if(new_pos < 0){
+    if new_pos < 0 {
         new_pos += 100;
     }
 
