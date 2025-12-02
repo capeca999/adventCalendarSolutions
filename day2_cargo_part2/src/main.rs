@@ -1,6 +1,6 @@
+use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Error};
-use regex::Regex;
 fn main() {
     let file_path = "src/puzzleInput.txt";
     let file = File::open(file_path);
@@ -23,26 +23,20 @@ fn resolve_puzzle(file: File) -> Result<i64, Error> {
         sum_pairs += catch_pairs(pulled_apart.0, pulled_apart.1);
     }
 
-    return Ok(sum_pairs);
-
+    Ok(sum_pairs)
 }
 
 fn clean_regex_file(file: File) -> Result<String, Error> {
     let reader = BufReader::new(file);
-    let line = reader
-        .lines()
-        .next()
-        .unwrap()?;
-    return Ok(line.trim().to_string());
+    let line = reader.lines().next().unwrap()?;
+
+    Ok(line.trim().to_string())
 }
 
 fn segment_text_file(line: String) -> Vec<String> {
     let re = Regex::new(r"\d+-\d+").unwrap();
 
-    let matches: Vec<&str> = re
-        .find_iter(line.as_str())
-        .map(|m| m.as_str())
-        .collect();
+    let matches: Vec<&str> = re.find_iter(line.as_str()).map(|m| m.as_str()).collect();
 
     let mut segments: Vec<String> = Vec::new();
 
@@ -50,7 +44,7 @@ fn segment_text_file(line: String) -> Vec<String> {
         segments.push(m.to_string());
     }
 
-    return segments;
+    segments
 }
 
 fn pull_appart_pairs(pair: &str) -> (&str, &str) {
