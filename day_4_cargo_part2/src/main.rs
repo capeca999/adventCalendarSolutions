@@ -1,6 +1,10 @@
 use std::fs::File;
 use std::io::{BufRead, BufReader, Error};
+use std::thread;
+use std::thread::Thread;
+use std::time::Duration;
 
+const AT_SIGN: char = '@';
 
 fn main() {
     let file_path = "src/puzzleInput.txt";
@@ -16,41 +20,29 @@ fn main() {
 
 fn resolve_puzzle(file: File) -> Result<i32, Error> {
     let reader = BufReader::new(file);
-    let mut has_something_changed = false;
-    let mut matriz: Vec<Vec<char>> = Vec::new();
-
+    let mut has_something_changed:bool;
+    let mut matrix: Vec<Vec<char>> = Vec::new();
     for line_result in reader.lines() {
         let line = line_result?;
         let chars: Vec<char> = line.chars().collect();
-        matriz.push(chars);
+        matrix.push(chars);
     }
 
     let mut times_reached_break_point = 0;
 
-    let height = matriz.len();
-    let width = matriz[0].len();
-    let mut matriz_copy = matriz.clone();
+    let height = matrix.len();
+    let width = matrix[0].len();
+    let mut matrix_mirror = matrix.clone();
 
     loop{
         has_something_changed = false;
-        matriz = matriz_copy.clone();
-        for fila in 0..height {
-            for caracter in 0..width {
-                if matriz[fila][caracter] == '@' {
-                    let mut count = 0;
+        matrix = matrix_mirror.clone();
+        for row in 0..height {
+            for character in 0..width {
+                if matrix[row][character] == AT_SIGN {
 
-                    if fila + 1 < height && matriz[fila + 1][caracter] == '@' { count += 1; }
-                    if fila >= 1 && matriz[fila - 1][caracter] == '@' { count += 1; }
-                    if caracter + 1 < width && matriz[fila][caracter + 1] == '@' { count += 1; }
-                    if caracter >= 1 && matriz[fila][caracter - 1] == '@' { count += 1; }
-
-                    if fila + 1 < height && caracter + 1 < width && matriz[fila + 1][caracter + 1] == '@' { count += 1; }
-                    if fila + 1 < height && caracter >= 1 && matriz[fila + 1][caracter - 1] == '@' { count += 1; }
-                    if fila >= 1 && caracter + 1 < width && matriz[fila - 1][caracter + 1] == '@' { count += 1; }
-                    if fila >= 1 && caracter >= 1 && matriz[fila - 1][caracter - 1] == '@' { count += 1; }
-
-                    if matriz[fila][caracter] == '@' && count < 4 {
-                        matriz_copy[fila][caracter] = '$';
+                    if matrix[row][character] == AT_SIGN && check_availability(&mut matrix, height, width, row, character) < 4 {
+                        matrix_mirror[row][character] = '.';
                         times_reached_break_point += 1;
                         has_something_changed = true;
                     }
@@ -60,10 +52,27 @@ fn resolve_puzzle(file: File) -> Result<i32, Error> {
         if has_something_changed == false {
             break;
         }
-        
+
+        println!("{}", matrix_mirror.iter().map(|r| r.iter().collect::<String>()).collect::<Vec<String>>().join("\n"));
+        thread::sleep(Duration::from_millis(125));
+
     }
     Ok(times_reached_break_point)
 
+}
+
+fn check_availability(matriz: &mut Vec<Vec<char>>, height: usize, width: usize, fila: usize, character: usize) -> i32 {
+    let mut count = 0;
+    if fila + 1 < height && matriz[fila + 1][character] == AT_SIGN { count += 1; }
+    if fila >= 1 && matriz[fila - 1][character] == AT_SIGN { count += 1; }
+    if character + 1 < width && matriz[fila][character + 1] == AT_SIGN { count += 1; }
+    if character >= 1 && matriz[fila][character - 1] == AT_SIGN { count += 1; }
+
+    if fila + 1 < height && character + 1 < width && matriz[fila + 1][character + 1] == AT_SIGN { count += 1; }
+    if fila + 1 < height && character >= 1 && matriz[fila + 1][character - 1] == AT_SIGN { count += 1; }
+    if fila >= 1 && character + 1 < width && matriz[fila - 1][character + 1] == AT_SIGN { count += 1; }
+    if fila >= 1 && character >= 1 && matriz[fila - 1][character - 1] == AT_SIGN { count += 1; }
+    count
 }
 
 
